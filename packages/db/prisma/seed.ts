@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 const prisma = new PrismaClient()
 
 async function main() {
-  const alice = await prisma.user.upsert({
+  const alice = await prisma.user.upsert({// insert or either if entry is present then update it 
     where: { number: '1111111111' },
     update: {},
     create: {
@@ -12,7 +12,7 @@ async function main() {
       name: 'alice',
       Balance: {
         create: {
-            amount: 20000,
+            amount: 20000, //amt is 20
             locked: 0
         }
       },
