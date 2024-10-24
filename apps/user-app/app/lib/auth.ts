@@ -1,73 +1,70 @@
 import db from "@repo/db/client";
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcrypt";
+import {z} from "zod"
 
+const signinSchema = z.object({
+    email : z.string().email("invalid email address").nonempty("email is required"),
+    number : z.string().min(10,"number should be atleast 10 charecters").nonempty("number is required"),
+    password : z.string().min(4,"password should be atleast 4 charecters").nonempty("password is requried"),
+})
 export const authOptions = {
     providers: [
       CredentialsProvider({
           name: 'Credentials',
           credentials: {
-            phone: { label: "Phone number", type: "text", placeholder: "1231231231", required: true },
+            number: { label: "Phone number", type: "text", placeholder: "1231231231", required: true },
+            email : {label : 'email' , type : "text" , placeholder : "abcd@gmail.com" , required : true},
             password: { label: "Password", type: "password", required: true }
           },
-          // TODO: User credentials type from next-aut
+          //  User credentials type from next-aut
           async authorize(credentials: any) {
-            // Do zod validation, OTP validation here
-            const hashedPassword = await bcrypt.hash(credentials.password, 10);
-            const existingUser = await db.user.findFirst({
-                where: {
-                    number: credentials.phone
-                }
-            });
-
-            if (existingUser) {
-                const passwordValidation = await bcrypt.compare(credentials.password, existingUser.password);
-                if (passwordValidation) {
-                    return {
-                        id: existingUser.id.toString(),
-                        name: existingUser.name,
-                        email: existingUser.number
-                    }
-                }
-                return null;
-            }
-
-            try {
-                const user = await db.user.create({
-                    data: {
-                        number: credentials.phone,
-                        password: hashedPassword
+            try{
+                // Do zod validation, >
+                const validatedCredentials = signinSchema.parse(credentials);
+                const existingUser = await db.user.findFirst({
+                    where: {
+                        number: validatedCredentials.number,
+                        email : validatedCredentials.email
                     }
                 });
-                const balance  = await db.balance.create({
-                    data : {
-                        userId : user.id,
-                        amount : 0,
-                        locked : 0
+                if (existingUser) {
+                    const passwordValidation = await bcrypt.compare(validatedCredentials.password, existingUser.password);
+                    if (!passwordValidation) {
+                        return {
+                            id: existingUser.id.toString(),
+                            name: existingUser.name,
+                            email: existingUser.email,
+                            number : existingUser.number
+                        }
                     }
-                })
-            
-                return {
-                    id: user.id.toString(),
-                    number: user.number,
-                    amount : balance.amount,
-                    locked : balance.locked
+                    return null;
                 }
-            } catch(e) {
-                console.error(e);
+                return null
+            } catch(e){
+                console.error("error occured " , e);
+                return null;
             }
-
-            return null
           },
         })
     ],
     secret: process.env.JWT_SECRET || "secret",
     callbacks: {
-        // TODO: can u fix the type here? Using any is bad
         async session({ token, session }: any) {
-            session.user.id = token.sub
-
-            return session
+            if(session.user){
+                const user = await db.user.findUnique({
+                    where :{
+                        email : session.user.email,
+                        number : session.user.number
+                    }
+                });
+                if(user){
+                    session.user.name = user.name;
+                    session.user.email = user.email;
+                    session.user.number = user.number;
+                }
+            }
+            return session;
         }
     }
   }
