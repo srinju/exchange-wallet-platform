@@ -23,6 +23,7 @@ const Signup = () => {
         setError('');
         setSuccess('');
         try {
+            console.log("THE FORM DATA THAT IS BEING SENT TO THE SIGNUO ROUTE ",formData);
             const res = await fetch("/api/Signup",{
                 method : 'POST',
                 headers : {

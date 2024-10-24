@@ -25,7 +25,7 @@ export const authOptions = {
                 const existingUser = await db.user.findFirst({
                     where: {
                         number: validatedCredentials.number,
-                        email : validatedCredentials.email
+                        //email : validatedCredentials.email
                     }
                 });
                 if (existingUser) {
