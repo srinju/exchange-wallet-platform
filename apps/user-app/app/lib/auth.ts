@@ -51,19 +51,8 @@ export const authOptions = {
     secret: process.env.JWT_SECRET || "secret",
     callbacks: {
         async session({ token, session }: any) {
-            if(session.user){
-                const user = await db.user.findUnique({
-                    where :{
-                        email : session.user.email,
-                        number : session.user.number
-                    }
-                });
-                if(user){
-                    session.user.name = user.name;
-                    session.user.email = user.email;
-                    session.user.number = user.number;
-                }
-            }
+            session.user.id = token.sub
+
             return session;
         }
     }

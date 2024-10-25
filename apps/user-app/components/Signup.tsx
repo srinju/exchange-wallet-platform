@@ -1,8 +1,10 @@
 "use client"
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 
 const Signup = () => {
+    const router = useRouter();
     const[user,serUser] = useState(null);
     const [error,setError] = useState('');
     const [success , setSuccess] = useState('');
@@ -19,7 +21,7 @@ const Signup = () => {
         });
     };
     const handleSubmit = async (e : any) => {
-        e.prevent.default();
+        e.preventDefault();
         setError('');
         setSuccess('');
         try {
@@ -38,6 +40,7 @@ const Signup = () => {
             const data = await res.json();
             console.log('user created',data);
             serUser(data.user);
+            router.push('/api/auth/signin');
         } catch (error) {
             console.error('error occured during signup' , error);
             setError('an error occured during signup');
