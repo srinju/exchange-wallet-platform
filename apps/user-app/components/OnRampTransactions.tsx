@@ -22,14 +22,14 @@ export const OnRampTransactions = ({
         <div className="pt-2">
             {transactions.map(t => <div className="flex justify-between">
                 <div>
-                    <div className="text-sm">
+                    <div className="text-sm text-slate-950">
                         Received INR
                     </div>
                     <div className="text-slate-600 text-xs">
                         {t.time.toDateString()}
                     </div>
                 </div>
-                <div className="flex flex-col justify-center">
+                <div className="flex flex-col justify-center text-slate-950">
                     + Rs {t.amount / 100}
                 </div>
 

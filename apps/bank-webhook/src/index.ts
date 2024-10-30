@@ -84,3 +84,9 @@ app.post("/hdfcWebhook", async (req, res) => {
 })
 
 app.listen(3003);
+
+//basically what happens is>>
+//we send request to a then a token is generated basikcally what happens is when we
+//create an account a token is created and when we are sednign any request to the 
+//webhhok the token is sent and the wehook idfentifies which account is sending the reqeust
+//and operates based on that , with the token the webhook connects it with their respective banks
