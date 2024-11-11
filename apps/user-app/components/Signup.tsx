@@ -5,7 +5,7 @@ import React, { useState } from 'react'
 
 const Signup = () => {
     const router = useRouter();
-    const[user,serUser] = useState(null);
+    const[user,setUser] = useState(null);
     const [error,setError] = useState('');
     const [success , setSuccess] = useState('');
     const [formData , setFormData] = useState({
